@@ -1,12 +1,12 @@
-package com.feedhenry.helloworld_app_android.app;
+package com.feedhenry.helloworld;
+
+import org.json.fh.JSONArray;
+import org.json.fh.JSONObject;
 
 import com.feedhenry.sdk.FH;
 import com.feedhenry.sdk.FHActCallback;
 import com.feedhenry.sdk.FHResponse;
 import com.feedhenry.sdk.api.FHActRequest;
-
-import org.json.fh.JSONArray;
-import org.json.fh.JSONObject;
 
 public class FHAgent {
 
