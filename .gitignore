@@ -22,4 +22,7 @@ build
 .grunt
 
 node_modules
+.classpath
+.project
+bin/*
 
