@@ -6,22 +6,21 @@ import org.json.fh.JSONObject;
 import com.feedhenry.sdk.FH;
 import com.feedhenry.sdk.FHActCallback;
 import com.feedhenry.sdk.FHResponse;
-import com.feedhenry.sdk.api.FHActRequest;
+import com.feedhenry.sdk.api.FHCloudRequest;
 
 public class FHAgent {
 
 
-    public void cloudCall(FHActCallback fhActCallback) {
-
+    public void cloudCall(FHActCallback fhCallback) {
         JSONObject param = new JSONObject("{hello: 'world'}");
-        this.call("hello", param, fhActCallback);
+        this.call("hello", param, fhCallback);
     }
 
 
-    private void call(final String act, final JSONObject params, final FHActCallback callback) {
+    private void call(final String path, final JSONObject params, final FHActCallback callback) {
 
         try {
-            FHActRequest request = FH.buildActRequest(act, params);
+            FHCloudRequest request = FH.buildCloudRequest(path, "POST", null, params);
             request.executeAsync(callback);
         } catch (Exception e) {
             e.printStackTrace();
