@@ -14,72 +14,92 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements OnClickListener{
+public class MainActivity extends Activity implements OnClickListener {
 
 	private boolean initialised = false;
+	private Button cloudButton;
 
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        FH.init(this, new FHActCallback() {
+		// Initialize button
+		cloudButton = (Button) findViewById(R.id.button);
+		cloudButton.setOnClickListener(this);
+		cloudButton.setEnabled(false);
+		
+		initFH();
+	}
 
-            @Override
-            public void success(FHResponse resp) {
+	private void initFH() {
 
-                initialised = true;
+		if (!initialised) {
+			FH.init(getApplicationContext(), new FHActCallback() {
+				@Override
+				public void success(FHResponse resp) {
+					initialised = true;
+					Toast.makeText(getApplicationContext(), "Init Success",
+							Toast.LENGTH_SHORT).show();
+					 cloudButton.setEnabled(true);
+				}
 
-            }
+				@Override
+				public void fail(FHResponse response) {
+					Log.i("fh",
+							"Init failed with FH Cloud"
+									+ response.getRawResponse());
+					Toast.makeText(getApplicationContext(), "Init Fail",
+							Toast.LENGTH_SHORT).show();
+				}
+			});
+		}
+	}
 
-            @Override
-            public void fail(FHResponse response) {
+	@Override
+	public void onClick(View v) {
+		if (initialised) {
+			callCloud();
+		} else {
+			Toast.makeText(getApplicationContext(), "App not Initialized",
+					Toast.LENGTH_SHORT).show();
+		}
+	}
 
-                Log.i("fh", "Init failed with FH Cloud" + response.getRawResponse());
+	private void callCloud() {
+		// Use FH Agent to call the FH Cloud
+		FHAgent fhAgent = new FHAgent();
+		fhAgent.cloudCall(new FHActCallback() {
+			@Override
+			public void success(FHResponse fhResponse) {
+				TextView tv = (TextView) findViewById(R.id.cloud_response);
+				tv.setText(fhResponse.getJson().getString("msg"));
+			}
 
-            }
-        });
+			@Override
+			public void fail(FHResponse fhResponse) {
+				Toast.makeText(getApplicationContext(),
+						"Cloud Call failed + " + fhResponse.getRawResponse(),
+						Toast.LENGTH_SHORT).show();
+				Log.i("fh",
+						"Cloud Call failed + " + fhResponse.getRawResponse());
+			}
+		});
+	}
 
-        // Initialize button
-        Button cloudButton = (Button) findViewById(R.id.button);
-        cloudButton.setOnClickListener(this);
-    }
-    
-    
-    @Override
-    public void onClick(View v) {
+	@Override
+	protected void onStop() {
+		try {
+			FH.stop();
+		} catch (Exception e) {}
+		super.onStop();
+	}
 
-        if (initialised) {
-            callCloud();
-        } else {
-            Toast.makeText(getApplicationContext(), "App not Initialized", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-
-    private void callCloud() {
-        // Use FH Agent to call the FH Cloud
-        FHAgent fhAgent = new FHAgent();
-        fhAgent.cloudCall(new FHActCallback() {
-            @Override
-            public void success(FHResponse fhResponse) {
-                TextView tv = (TextView) findViewById(R.id.cloud_response);
-                tv.setText(fhResponse.getJson().getString("msg"));
-            }
-
-            @Override
-            public void fail(FHResponse fhResponse) {
-                Toast.makeText(getApplicationContext(), "Cloud Call failed", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-
-    @Override
-    protected void onStop() {
-      FH.stop();
-      super.onStop();
-    }
-    
-    
+	@Override
+	protected void onPause() {
+		try {
+			FH.stop();
+		} catch (Exception e) {}
+		super.onPause();
+	}
 }
