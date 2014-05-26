@@ -89,17 +89,13 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	@Override
 	protected void onStop() {
-		try {
-			FH.stop();
-		} catch (Exception e) {}
+		FH.stop();
 		super.onStop();
 	}
 
 	@Override
 	protected void onPause() {
-		try {
-			FH.stop();
-		} catch (Exception e) {}
+		FH.stop();
 		super.onPause();
 	}
 }
