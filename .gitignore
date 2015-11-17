@@ -25,4 +25,4 @@ node_modules
 .classpath
 .project
 bin/*
-
+gen/*
